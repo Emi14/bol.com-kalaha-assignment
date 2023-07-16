@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="game.css"/>
+
+    <title>Kalaha</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"> <img src="bol-logo.jpg" alt="" width="120" height="50" class="d-inline-block align-text-top">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="index.html">Games</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="newGame.html">Create new game</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="player.html">Players</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="newPlayer.html">Create new player</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+
+    <h1>Kalaha</h1>
+
+    <div id="form-container">
+        <div id="form-div" class="d-flex justify-content-center">
+            <form id="form">
+                <div class="mb-3">
+                    <label for="firstPlayer" class="form-label">First player id</label>
+                    <input type="tel" class="form-control" id="firstPlayer">
+                </div>
+                <div class="mb-3">
+                    <label for="secondPlayer" class="form-label">Second player id</label>
+                    <input type="tel" class="form-control" id="secondPlayer">
+                </div>
+                <button type="submit" class="btn btn-primary">Start game</button>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+<script>
+    document.getElementById('form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const form = event.target;
+
+        startGame(form.firstPlayer.value, form.secondPlayer.value);
+        form.reset();
+    }, false);
+
+    function startGame(firstPlayerId, secondPlayerId) {
+        fetch('http://localhost:8080/game/start?firstPlayerId=' + firstPlayerId + '&secondPlayerId=' + secondPlayerId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(res => {
+            return res.json();
+        }).then(game => {
+            console.log(game);
+            window.location.href="game.html?gameId="+game.id;
+        }).catch(error => console.log(error))
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+        integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+        crossorigin="anonymous"></script>
+</body>
+</html>

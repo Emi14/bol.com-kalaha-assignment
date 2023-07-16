@@ -1,2 +1,2 @@
-# bol-kalaha-assignment
-Repository containing an implementation of Kalaha game
+# Kalaha API
+This repository contains an implementation of Kalaha game.
