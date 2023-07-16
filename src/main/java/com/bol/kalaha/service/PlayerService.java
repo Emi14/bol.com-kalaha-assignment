@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @Service
 public class PlayerService {
 
+    private static final String PLAYER_WITH_ID_COULD_NOT_BE_FOUND = "Player with id %s could not be found.";
+
     private final PlayerRepository playerRepository;
     private final PlayerMapper playerMapper;
 
@@ -57,7 +59,7 @@ public class PlayerService {
      */
     public PlayerEntity findOneById(int id) throws PlayerNotFoundException {
         return playerRepository.findById(id).orElseThrow(() -> {
-            log.error(String.format("Player with id %s could not be found.", id));
+            log.error(String.format(PLAYER_WITH_ID_COULD_NOT_BE_FOUND, id));
             return new PlayerNotFoundException(id);
         });
     }

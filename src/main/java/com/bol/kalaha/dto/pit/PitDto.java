@@ -11,11 +11,11 @@ import lombok.Setter;
 @Setter
 public abstract class PitDto {
 
-    private int pitId;
-    private int seeds;
-    private int ownerId;
+    private Integer pitId;
+    private Integer seeds;
+    private Integer ownerId;
 
-    public PitDto(int pitId, int seeds, int ownerId) {
+    public PitDto(Integer pitId, Integer seeds, Integer ownerId) {
         this.pitId = pitId;
         this.seeds = seeds;
         this.ownerId = ownerId;

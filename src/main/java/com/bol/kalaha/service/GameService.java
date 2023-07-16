@@ -26,6 +26,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GameService {
 
+    private static final String PLAYER_IDS_MUST_BE_NOT_NULL_AND_UNIQUE = "In order to start a game, player ids must be not null and unique.";
+    private static final String GAME_WITH_ID_COULD_NOT_BE_FOUND = "Game with id %s could not be found.";
+    private static final String COMMA = ",";
+    private static final String ZERO = "0";
+    private static final String EXCEPTION_OCCURED_START_GAME = "Exception occurred while trying to start a new game. " +
+            "The given players ids are null or not unique: firstPlayerId: %s, secondPlayerId: %s";
+    private static final String IS_NOT_YOUR_TURN = "Is not your turn.";
+
     private final PlayerService playerService;
     private final BoardService boardService;
     private final GameRepository gameRepository;
@@ -59,9 +67,7 @@ public class GameService {
                 .startTime(LocalDateTime.now())
                 .build();
 
-        gameEntity = gameRepository.save(gameEntity);
-
-        return gameMapper.mapEntityToDto(gameEntity);
+        return gameMapper.mapEntityToDto(gameRepository.save(gameEntity));
     }
 
     /**
@@ -72,9 +78,8 @@ public class GameService {
      */
     private void validatePlayers(Integer firstPlayerId, Integer secondPlayerId) {
         if (firstPlayerId == null || secondPlayerId == null || firstPlayerId.equals(secondPlayerId)) {
-            log.error(String.format("Exception occurred while trying to start a new game." +
-                    "The given players ids are null or not unique: firstPlayerId: %s, secondPlayerId: %s", firstPlayerId, secondPlayerId));
-            throw new IllegalArgumentException("In order to start a game, player ids must be not null and unique.");
+            log.error(String.format(EXCEPTION_OCCURED_START_GAME, firstPlayerId, secondPlayerId));
+            throw new IllegalArgumentException(PLAYER_IDS_MUST_BE_NOT_NULL_AND_UNIQUE);
         }
     }
 
@@ -99,7 +104,7 @@ public class GameService {
     public GameEntity findOneById(int id) throws GameNotFoundException {
         return gameRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error(String.format("Game with id %s could not be found.", id));
+                    log.error(String.format(GAME_WITH_ID_COULD_NOT_BE_FOUND, id));
                     return new GameNotFoundException(id);
                 });
     }
@@ -158,10 +163,19 @@ public class GameService {
      * @return true if game is over or false otherwise
      */
     private boolean isGameOver(GameEntity gameEntity) {
-        return Arrays.stream(gameEntity.getBoardEntity().getFirstPlayerSmallPitsValues().split(","))
-                .allMatch(s -> s.equals("0"))
-                || Arrays.stream(gameEntity.getBoardEntity().getSecondPlayerSmallPitsValues().split(","))
-                .allMatch(s -> s.equals("0"));
+        return playerHasNoSeedsLeft(gameEntity.getBoardEntity().getFirstPlayerSmallPitsValues())
+                || playerHasNoSeedsLeft(gameEntity.getBoardEntity().getSecondPlayerSmallPitsValues());
+    }
+
+    /**
+     * Checks if the given player has no seeds remaining
+     *
+     * @param playerSmallPitsValues - player's small pits seeds
+     * @return true if game is over or false otherwise
+     */
+    private boolean playerHasNoSeedsLeft(String playerSmallPitsValues) {
+        return Arrays.stream(playerSmallPitsValues.split(COMMA))
+                .allMatch(s -> s.equals(ZERO));
     }
 
     /**
@@ -177,7 +191,7 @@ public class GameService {
         }
 
         if (!sowSeedsRequest.getPlayerId().equals(gameEntity.getBoardEntity().getNextTurn().getId())) {
-            throw new GameException("Is not your turn.");
+            throw new GameException(IS_NOT_YOUR_TURN);
         }
     }
 

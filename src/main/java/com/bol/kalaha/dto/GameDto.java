@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class GameDto {
 
-    private String id;
+    private Integer id;
     private BoardDto boardDto;
     private PlayerDto winner;
     private LocalDateTime startTime;

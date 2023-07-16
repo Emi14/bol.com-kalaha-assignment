@@ -6,7 +6,7 @@ package com.bol.kalaha.dto.pit;
  */
 public class SmallPitDto extends PitDto {
 
-    public SmallPitDto(int pitId, int seeds, int ownerId) {
+    public SmallPitDto(Integer pitId, Integer seeds, Integer ownerId) {
         super(pitId, seeds, ownerId);
     }
 

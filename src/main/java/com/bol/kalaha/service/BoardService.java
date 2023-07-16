@@ -2,7 +2,6 @@ package com.bol.kalaha.service;
 
 import com.bol.kalaha.dto.BoardDto;
 import com.bol.kalaha.dto.PlayerDto;
-import com.bol.kalaha.dto.pit.BigPitDto;
 import com.bol.kalaha.dto.pit.PitDto;
 import com.bol.kalaha.entity.BoardEntity;
 import com.bol.kalaha.entity.PlayerEntity;
@@ -27,8 +26,13 @@ import java.util.List;
 @Service
 public class BoardService {
 
+    private static final String COMMA = ",";
+    private static final String PIT_IS_EMPTY = "Pit is empty. Select another pit.";
+    private static final String THE_GIVEN_PIT_WITH_ID_IS_EMPTY_FOR_PLAYER_WITH_ID = "The given pit with id:%s is empty for player with id:%s";
+
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
+
     @Value("${number.of.small.pits.per.player}")
     private Integer numberOfSmallPits;
     @Value("${number.of.starting.seeds.per.small.pit}")
@@ -62,8 +66,8 @@ public class BoardService {
      * @return true if the given lastVisitedPit is a small pit owned the player making the sow, else otherwise
      */
     private boolean shouldCaptureOppositeSeeds(Integer playerId, PitDto lastVisitedPit) {
-        return lastVisitedPit.getPitId() != BigPitDto.BIG_PIT_DUMMY_ID &&
-                lastVisitedPit.getOwnerId() == playerId &&
+        return lastVisitedPit.getPitId() != null &&
+                lastVisitedPit.getOwnerId().equals(playerId) &&
                 lastVisitedPit.getSeeds() == 1;
     }
 
@@ -96,7 +100,7 @@ public class BoardService {
     private String getStartingSmallPitsValues() {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < numberOfSmallPits; i++) {
-            stringBuilder.append(numberOfStartingSeedsPerSmallPits).append(",");
+            stringBuilder.append(numberOfStartingSeedsPerSmallPits).append(COMMA);
         }
         return stringBuilder.substring(0, stringBuilder.length());
     }
@@ -115,10 +119,7 @@ public class BoardService {
         PlayerDto player = boardDto.getPlayerById(playerId);
         PlayerDto opponent = boardDto.getOpponentOf(playerId);
 
-        if (player.getSmallPits().get(pitId).getSeeds() == 0) {
-            log.error(String.format("The given pit with id:%s is empty for player with id:%s", pitId, playerId));
-            throw new GameException("Pit is empty. Select another pit.");
-        }
+        validatePitHasSeeds(pitId, player);
 
         PitDto lastVisitedPit = disperseSeeds(pitId, player, opponent);
 
@@ -130,6 +131,20 @@ public class BoardService {
             captureOppositeSeeds(player, opponent, lastVisitedPit);
         }
         boardRepository.save(boardMapper.mapDtoToEntity(boardDto));
+    }
+
+    /**
+     * Validate that the given pit has seeds
+     *
+     * @param pitId  - the pit to be sowed
+     * @param player - the player performing the sow
+     * @throws GameException when the given pit is empty.
+     */
+    private void validatePitHasSeeds(Integer pitId, PlayerDto player) throws GameException {
+        if (player.getSmallPits().get(pitId).getSeeds() == 0) {
+            log.error(String.format(THE_GIVEN_PIT_WITH_ID_IS_EMPTY_FOR_PLAYER_WITH_ID, pitId, player.getId()));
+            throw new GameException(PIT_IS_EMPTY);
+        }
     }
 
     /**

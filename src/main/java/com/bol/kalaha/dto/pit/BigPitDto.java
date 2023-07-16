@@ -6,13 +6,8 @@ package com.bol.kalaha.dto.pit;
  */
 public class BigPitDto extends PitDto {
 
-    /**
-     * There is only one big pit per player, so there is no need for a unique identifier.
-     */
-    public static final int BIG_PIT_DUMMY_ID = -1;
-
-    public BigPitDto(int seeds, int ownerId) {
-        super(BIG_PIT_DUMMY_ID, seeds, ownerId);
+    public BigPitDto(Integer seeds, Integer ownerId) {
+        super(null, seeds, ownerId);
     }
 
     /**
