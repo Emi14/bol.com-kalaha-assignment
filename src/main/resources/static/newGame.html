@@ -12,7 +12,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"> <img src="bol-logo.jpg" alt="" width="120" height="50" class="d-inline-block align-text-top">
+        <a class="navbar-brand" href="#"> <img src="bol-logo.png" alt="" width="120" height="30" class="d-inline-block align-text-top">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <div class="table-container"></div>
+    <div class="table-container">
     <table class="table table-dark table-striped">
         <thead>
         <tr>
@@ -65,11 +65,12 @@
         </thead>
         <tbody>
         </tbody>
-
     </table>
+    </div>
 
 
 </div>
+<script src='js/kalaha.js'></script>
 <script>
     document.getElementById('form').addEventListener('submit', function (event) {
         event.preventDefault();
@@ -80,34 +81,7 @@
         form.reset();
     }, false);
 
-    function startGame(firstPlayerId, secondPlayerId) {
-        fetch('http://localhost:8080/game/start?firstPlayerId=' + firstPlayerId + '&secondPlayerId=' + secondPlayerId, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(res => {
-            return res.json();
-        }).then(game => {
-            console.log(game);
-            window.location.href="game.html?gameId="+game.id;
-        }).catch(error => console.log(error))
-    }
-
-    fetch('http://localhost:8080/player/all')
-        .then(res => {
-            return res.json();
-        })
-        .then(players => {
-            players.forEach(player => {
-
-                const tableRow = `<tr>
-      <td>${player.id}</td>
-      <td>${player.name}</td>
-    </tr>`
-                document.querySelector('tbody').insertAdjacentHTML('beforeend', tableRow)
-            })
-        }).catch(error => console.log(error))
+    fetchAllPlayers();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
