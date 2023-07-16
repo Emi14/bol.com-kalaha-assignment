@@ -72,4 +72,9 @@ public class GameController {
     public GameDto sowSeeds(@Valid @RequestBody SowSeedsRequestDto sowSeedsRequest) throws GameException, PlayerNotFoundException {
         return gameService.playTurn(sowSeedsRequest);
     }
+
+    @GetMapping("/index")
+    public String index() {
+        return "index";
+    }
 }

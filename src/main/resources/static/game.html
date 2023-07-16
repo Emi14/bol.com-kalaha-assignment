@@ -47,6 +47,16 @@
     let id = new URLSearchParams(window.location.search).get('gameId');
     console.log(id);
 
+    function disableEmptyPits(game) {
+        let pits = document.getElementsByClassName("pit");
+        for (let i = 0; i < pits.length; i++) {
+            if(pits[i].textContent == "0") {
+                pits[i].removeAttribute("onclick");
+                pits[i].style.cursor = "default";
+            }
+        }
+    }
+
     function setNextTurn(game) {
         if(Object.hasOwn(game, 'winner')){
             let pits = document.getElementsByClassName("pit");
@@ -55,17 +65,20 @@
                 pits[i].style.cursor = "default";
             }
         } else {
-            let playerRow;
+            let playerRow, playerNameContainer;
             if (game.boardDto.nextTurn.id == game.boardDto.firstPlayer.id) {
                 playerRow = document.getElementById("player-two-row");
+                playerNameContainer = document.getElementById("player-one-name-container");
             } else {
                 playerRow = document.getElementById("player-one-row");
+                playerNameContainer = document.getElementById("player-two-name-container");
             }
             let children = playerRow.children;
             for (let i = 0; i < children.length; i++) {
                 children[i].removeAttribute("onclick");
                 children[i].style.cursor = "default";
             }
+            playerNameContainer.insertAdjacentHTML("beforeend","<p style=\"color:red;\">Is your turn</p>")
         }
     }
 
@@ -86,12 +99,15 @@
             document.getElementById('top-container').innerHTML = getBoard(game, id);
             appendWinnerModal(game);
             setNextTurn(game);
+            disableEmptyPits(game);
         }).catch(error => console.log(error))
     }
 
     function getBoard(game, id) {
         return `<div>
+                <div id="player-two-name-container">
                 Player 2: ${game.boardDto.secondPlayer.name}
+                </div>
             <div class="board">
             <div class="player-two store">${game.boardDto.secondPlayer.bigPitDto.seeds}</div>
 
@@ -117,7 +133,9 @@
 
             <div class="player-one store">${game.boardDto.firstPlayer.bigPitDto.seeds}</div>
         </div>
-        Player 1: ${game.boardDto.firstPlayer.name}</div>`;
+        <div id="player-one-name-container">
+        Player 1: ${game.boardDto.firstPlayer.name}</div>
+        </div>`;
     }
 
     function appendWinnerModal(game) {
@@ -140,6 +158,7 @@
             appendWinnerModal(game);
             document.getElementById('top-container').insertAdjacentHTML('beforeend', getBoard(game, id))
             setNextTurn(game);
+            disableEmptyPits(game);
         }).catch(error => console.log(error))
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"

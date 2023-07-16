@@ -6,7 +6,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="game.css"/>
-    <title>Home</title>
+
+    <title>Kalaha</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -35,50 +36,77 @@
     </div>
 </nav>
 <div class="container-fluid">
+
+    <h1>Kalaha</h1>
+
+    <div id="form-container">
+        <div id="form-div" class="d-flex justify-content-center">
+            <form id="form">
+                <div class="mb-3">
+                    <label for="firstPlayer" class="form-label">First player id</label>
+                    <input type="tel" class="form-control" id="firstPlayer">
+                </div>
+                <div class="mb-3">
+                    <label for="secondPlayer" class="form-label">Second player id</label>
+                    <input type="tel" class="form-control" id="secondPlayer">
+                </div>
+                <button type="submit" class="btn btn-primary">Start game</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container"></div>
     <table class="table table-dark table-striped">
         <thead>
         <tr>
-            <th scope="col">Game ID</th>
-            <th scope="col">Continue game</th>
-            <th scope="col">First player</th>
-            <th scope="col">Second player</th>
-            <th scope="col">Is over</th>
-            <th scope="col">Winner</th>
-            <th scope="col">Start time</th>
-            <th scope="col">End time</th>
+            <th scope="col">Player ID</th>
+            <th scope="col">Player name</th>
         </tr>
         </thead>
         <tbody>
         </tbody>
 
     </table>
+
+
 </div>
 <script>
-    fetch('http://localhost:8080/game/all')
+    document.getElementById('form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const form = event.target;
+
+        startGame(form.firstPlayer.value, form.secondPlayer.value);
+        form.reset();
+    }, false);
+
+    function startGame(firstPlayerId, secondPlayerId) {
+        fetch('http://localhost:8080/game/start?firstPlayerId=' + firstPlayerId + '&secondPlayerId=' + secondPlayerId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(res => {
+            return res.json();
+        }).then(game => {
+            console.log(game);
+            window.location.href="game.html?gameId="+game.id;
+        }).catch(error => console.log(error))
+    }
+
+    fetch('http://localhost:8080/player/all')
         .then(res => {
             return res.json();
         })
-        .then(data => {
-            data.forEach(game => {
-                let isOver = game.winner != null;
-                let winnerName = "N/A";
-                let playGameButton = '<a class="btn btn-outline-success" href="game.html?gameId=' + game.id + '" role="button">Play</a>';
-                if(isOver){
-                    winnerName = game.winner.name;
-                    playGameButton = '<button type="button" class="btn btn-outline-danger" disabled>N/A</button>';
-                }
+        .then(players => {
+            players.forEach(player => {
+
                 const tableRow = `<tr>
-      <td>${game.id}</td>
-      <td>${playGameButton}</td>
-      <td>${game.boardDto.firstPlayer.name}</td>
-      <td>${game.boardDto.secondPlayer.name}</td>
-      <td>${isOver}</td>
-      <td>${winnerName}</td>
-      <td>${game.startTime}</td>
-      <td>${game.endTime}</td>
+      <td>${player.id}</td>
+      <td>${player.name}</td>
     </tr>`
-              document.querySelector('tbody').insertAdjacentHTML('beforeend', tableRow)
-            });
+                document.querySelector('tbody').insertAdjacentHTML('beforeend', tableRow)
+            })
         }).catch(error => console.log(error))
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
